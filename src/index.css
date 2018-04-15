@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+.visible.transition {
+  margin-top: auto !important;
+  margin-left: auto!important;
+  margin-right: auto!important;
+  display: inline-block !important;
+  position: relative;
+  top: 20%;
+}

@@ -1,0 +1,12 @@
+.linksContainer{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.bigButton{
+    margin: 10px;
+    display: inline-block;
+}
