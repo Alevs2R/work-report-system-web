@@ -114,7 +114,7 @@ export default class UserInfo extends Component {
             );
         } else {
             return (
-                <Button type="button" onClick={() => {
+                <Button id="save" type="button" onClick={() => {
                     this.save(true)
                 }}>Save</Button>
             );
@@ -130,10 +130,10 @@ export default class UserInfo extends Component {
                 <Form loading={this.state.loading}>
                     <Form.Field required error={this.state.errors.username}>
                         <label>Name</label>
-                        <input value={this.state.user.username} onChange={this.changeName}/>
+                        <input id="username" value={this.state.user.username} onChange={this.changeName}/>
                     </Form.Field>
 
-                    <Form.Select label="Role" value={this.state.user.role} onChange={this.changeRole} options={roles}/>
+                    <Form.Select id="role" label="Role" value={this.state.user.role} onChange={this.changeRole} options={roles}/>
 
                     {this.renderButtons()}
                     {this.state.saved &&

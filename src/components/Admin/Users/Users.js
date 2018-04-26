@@ -83,7 +83,7 @@ export default class Users extends React.Component {
                 <Header as="h1">
                     Users
                     <Loader active={this.state.loading}/>
-                    <Link to={`${this.props.match.url}/add`}><Button floated="right"><Icon name="add"/>Add user</Button></Link>
+                    <Link to={`${this.props.match.url}/add`}><Button floated="right" id="addUser"><Icon name="add"/>Add user</Button></Link>
                 </Header>
                 {this.state.users &&
                 <Table celled>

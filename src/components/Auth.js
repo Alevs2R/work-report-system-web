@@ -66,6 +66,7 @@ export default class Auth extends Component {
                                     onChange={(e, {value}) => {
                                         this.setState({username: value})
                                     }}
+                                    id="login"
                                 />
                                 <Form.Input
                                     fluid
@@ -75,12 +76,13 @@ export default class Auth extends Component {
                                     type='password'
                                     value={this.state.password}
                                     onChange={(e, {value}) => this.setState({password: value})}
+                                    id="password"
                                 />
 
                                 <Button color='teal' fluid size='large' onClick={this.loginClicked}
                                         loading={this.state.loading}>Login</Button>
                                 {this.state.error &&
-                                <Segment color='red'>{this.state.error}</Segment>
+                                <Segment color='red' id="error">{this.state.error}</Segment>
                                 }
                             </Segment>
                         </Form>

@@ -31,7 +31,7 @@ export default class Admin extends Component {
         const {pathname} = this.props.location;
 
         return (
-            <div>
+            <div id="adminPanel">
                 <Menu fixed='top' inverted>
                     <Container>
                         <Link to={match.url}>
@@ -39,12 +39,12 @@ export default class Admin extends Component {
                                 Admin panel
                             </Menu.Item>
                         </Link>
-                        <Link to={`${match.url}/users`}><Menu.Item active={pathname.includes(`${match.url}/users`)}>Users</Menu.Item></Link>
+                        <Link to={`${match.url}/users`}><Menu.Item active={pathname.includes(`${match.url}/users`)} id="usersList">Users</Menu.Item></Link>
                         <Link to={`${match.url}/jobs`}><Menu.Item active={pathname.includes(`${match.url}/jobs`)}>Jobs</Menu.Item></Link>
                         <Link to={`${match.url}/reports`}><Menu.Item active={pathname.includes(`${match.url}/reports`)}>Reports</Menu.Item></Link>
                         <Link to={`${match.url}/brigades`}><Menu.Item active={pathname.includes(`${match.url}/brigades`)}>Brigades</Menu.Item></Link>
                         <Menu.Menu position='right'>
-                            <Menu.Item onClick={this.logout}>Logout</Menu.Item>
+                            <Menu.Item onClick={this.logout} id="logout">Logout</Menu.Item>
                         </Menu.Menu>
                     </Container>
                 </Menu>

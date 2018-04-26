@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, Header, Icon, Modal } from 'semantic-ui-react'
 
 const RemoveConfirm = (props) => (
-    <Modal basic size='small' open={props.entity !== null}>
+    <Modal basic size='small' open={props.entity !== null} id="removeModal">
         <Header icon='delete' content={`Delete ${props.entityName}`} />
         <Modal.Content>
             <p>{`Do you want to remove ${props.entityName} "${props.entity ? props.entity.name : ''}"?`}</p>
@@ -11,7 +11,7 @@ const RemoveConfirm = (props) => (
             <Button basic color='red' inverted onClick={props.onCancel}>
                 <Icon name='remove' /> No
             </Button>
-            <Button color='green' inverted onClick={props.onConfirm}>
+            <Button color='green' inverted onClick={props.onConfirm} id="yesRemoveButton">
                 <Icon name='checkmark' /> Yes
             </Button>
         </Modal.Actions>
