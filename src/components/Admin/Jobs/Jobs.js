@@ -1,8 +1,8 @@
 import React from 'react';
 import {Button, Header, Loader, Message, Popup, Table, Icon} from "semantic-ui-react";
-import * as api from "../../api/jobs";
-import RemoveJobConfirm from "./RemoveJobConfirm";
+import * as api from "../../../api/jobs";
 import {Link} from "react-router-dom";
+import RemoveJobConfirm from "./RemoveJobConfirm";
 
 export default class Jobs extends React.Component {
 
@@ -18,7 +18,7 @@ export default class Jobs extends React.Component {
             loading: true
         });
         try {
-            const jobs = await api.getJobsList();
+            const jobs = (await api.getJobsList()).sort((a,b) => a.category.localeCompare(b.category));
             this.setState({
                 loading: false,
                 error: false,
@@ -49,27 +49,51 @@ export default class Jobs extends React.Component {
         }
     };
 
-    renderItems() {
-        return this.state.jobs.map(job => (
-            <Table.Row key={job.id}>
-                <Table.Cell>
+    renderCategoryRow(category){
+        return (
+            <Table.Row key={category} active>
+                <Table.Cell colSpan="2">
                     <Header as='h4'>
                         <Header.Content>
-                            {job.name}
+                            {category}
                         </Header.Content>
                     </Header>
                 </Table.Cell>
-                <Table.Cell textAlign="right">
-                    <Link to={`${this.props.match.url}/edit/${job.id}`}><Button>Edit</Button></Link>
-                    <Popup
-                        trigger={
-                            <Button icon="delete" onClick={() => this.setState({removeJob: job})}/>
-                        }
-                        content='Remove job'
-                    />
-                </Table.Cell>
             </Table.Row>
-        ))
+        );
+    }
+
+    renderItems() {
+        const items = [];
+        let lastCategory = null;
+
+        for(let job of this.state.jobs){
+            if(job.category !== lastCategory){
+                lastCategory = job.category;
+                items.push(this.renderCategoryRow(lastCategory));
+            }
+            items.push(
+                <Table.Row key={job.id}>
+                    <Table.Cell>
+                        <Header as='h4'>
+                            <Header.Content>
+                                {job.name}
+                            </Header.Content>
+                        </Header>
+                    </Table.Cell>
+                    <Table.Cell textAlign="right">
+                        <Link to={`${this.props.match.url}/edit/${job.id}`}><Button>Edit</Button></Link>
+                        <Popup
+                            trigger={
+                                <Button icon="delete" onClick={() => this.setState({removeJob: job})}/>
+                            }
+                            content='Remove job'
+                        />
+                    </Table.Cell>
+                </Table.Row>
+            )
+        }
+        return items;
     }
 
     render() {

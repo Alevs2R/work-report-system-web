@@ -11,7 +11,10 @@ export default class Dashboard extends React.Component {
                     <div className="bigButton"><Link to={`/admin/jobs`}><Button size="massive">Jobs</Button></Link></div>
                     <div className="bigButton"><Link to={`/admin/users`}><Button size="massive">Users</Button></Link></div>
                 </div>
-                <div className="bigButton"><Link to={`/admin/reports`}><Button size="massive">Reports</Button></Link></div>
+                <div>
+                    <div className="bigButton"><Link to={`/admin/reports`}><Button size="massive">Reports</Button></Link></div>
+                    <div className="bigButton"><Link to={`/admin/brigades`}><Button size="massive">Brigades</Button></Link></div>
+                </div>
             </div>
         );
     }

@@ -1,59 +1,75 @@
 import React from 'react';
-import {Button, Header, Loader, Message, Popup, Table} from "semantic-ui-react";
-import {getUsers} from "../../api/users";
+import {Button, Header, Icon, Loader, Message, Popup, Table} from "semantic-ui-react";
+import * as api from "../../../api/brigades";
+import {Link} from "react-router-dom";
+import RemoveBrigadeConfirm from "./RemoveBrigadeConfirm";
 
-export default class Users extends React.Component {
+export default class Brigades extends React.Component {
 
     state = {
         loading: true,
         error: false,
-        users: null
+        brigades: null,
+        removeBrigade: null,
     };
 
-    async loadUsers() {
+    async loadBrigades() {
         this.setState({
             loading: true
         });
         try {
-            const users = await getUsers();
+            const brigades = await api.getBrigadesList();
             this.setState({
                 loading: false,
                 error: false,
-                users
+                brigades
             });
         } catch (e) {
             this.setState({
                 loading: false,
                 error: true,
-                users: null
+                brigades: null
             });
         }
     }
 
     async componentDidMount() {
-        await this.loadUsers();
+        await this.loadBrigades();
     }
 
+    removeRow = async () => {
+        const id = this.state.removeBrigade.id;
+        this.setState({removeBrigade: null});
+
+        const removed = await api.deleteBrigade(id);
+        if (removed) {
+            this.setState({
+                brigades: this.state.brigades.filter(item => item.id !== id)
+            })
+        }
+    };
+
+
     renderItems() {
-        return this.state.users.map(user => (
-            <Table.Row key={user.id}>
+        return this.state.brigades.map(brigade => (
+            <Table.Row key={brigade.id}>
                 <Table.Cell>
                     <Header as='h4'>
                         <Header.Content>
-                            {user.username}
+                            {brigade.name}
                         </Header.Content>
                     </Header>
                 </Table.Cell>
                 <Table.Cell>
-                    {user.role}
+                    {brigade.role}
                 </Table.Cell>
                 <Table.Cell>
-                    <Button>Edit</Button>
+                    <Link to={`${this.props.match.url}/edit/${brigade.id}`}><Button>Edit</Button></Link>
                     <Popup
                         trigger={
-                            <Button icon="delete"/>
+                            <Button icon="delete" onClick={() => this.setState({removeBrigade: brigade})}/>
                         }
-                        content='Remove user'
+                        content='Remove brigade'
                     />
                 </Table.Cell>
             </Table.Row>
@@ -64,14 +80,15 @@ export default class Users extends React.Component {
         return (
             <div>
                 <Header as="h1">
-                    Users
+                    Brigades
                     <Loader active={this.state.loading}/>
+                    <Link to={`${this.props.match.url}/add`}><Button floated="right"><Icon name="add"/>Add brigade</Button></Link>
                 </Header>
-                {this.state.users &&
+                {this.state.brigades &&
                 <Table celled>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted="ascending">User</Table.HeaderCell>
+                            <Table.HeaderCell sorted="ascending">Brigade</Table.HeaderCell>
                             <Table.HeaderCell>Role</Table.HeaderCell>
                             <Table.HeaderCell></Table.HeaderCell>
                         </Table.Row>
@@ -87,9 +104,11 @@ export default class Users extends React.Component {
                     <Message.Header>
                         An error occured
                     </Message.Header>
-                    <Button onClick={this.loadUsers}>Reload</Button>
+                    <Button onClick={this.loadBrigades}>Reload</Button>
                 </Message>
                 }
+                <RemoveBrigadeConfirm brigade={this.state.removeBrigade} onCancel={() => this.setState({removeBrigade: null})}
+                                   onConfirm={this.removeRow}/>
             </div>
         );
     }

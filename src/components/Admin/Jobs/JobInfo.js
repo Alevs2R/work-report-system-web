@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Button, Form, Header, Segment} from "semantic-ui-react";
-import {createJob, getJob, updateJob} from "../../api/jobs";
+import {createJob, getCategories, getJob, updateJob} from "../../../api/jobs";
 import {Redirect} from "react-router-dom";
 
 const MODE_EDIT = 1;
@@ -11,13 +11,13 @@ export default class JobInfo extends Component {
     state = {
         job: {
             name: '',
-            formula: {
-                units_enabled: false,
-                price: '0',
-            },
+            formula: '',
+            units: '',
+            category: '',
             description: '',
         },
-        loading: false,
+        categories: [],
+        loading: true,
         saved: false,
         returnToMainSelected: false,
         returnToMain: false,
@@ -27,9 +27,10 @@ export default class JobInfo extends Component {
     async loadJob(id) {
         try {
             const job = await getJob(id);
-            job.formula = this.parseFormula(job.formula);
+            const categories = await getCategories();
             this.setState({
                 job,
+                categories,
                 loading: false,
             })
         } catch (e) {
@@ -40,14 +41,24 @@ export default class JobInfo extends Component {
         }
     }
 
+    async loadCategories() {
+        const categories = await getCategories();
+        this.setState({
+            categories,
+            loading: false,
+        })
+    }
+
+
     componentWillMount() {
         const mode = this.props.match.params.id ? MODE_EDIT : MODE_ADD;
         this.setState({
-            mode,
-            loading: mode === MODE_EDIT
+            mode
         });
         if (mode === MODE_EDIT) {
             this.loadJob(this.props.match.params.id);
+        } else {
+            this.loadCategories()
         }
     }
 
@@ -61,63 +72,26 @@ export default class JobInfo extends Component {
         this.setState({job});
     };
 
-    changeCountable = (e, {checked}) => {
-        const job = {...this.state.job};
-        const formula = {...job.formula};
-        formula.units_enabled = checked;
-        job.formula = formula;
-        this.setState({job})
+
+    changeFormula = (e) => {
+        const job = {...this.state.job, formula: e.target.value};
+        this.setState({job});
     };
 
-    changePrice = (e) => {
-        const job = {...this.state.job};
-        const formula = {...job.formula};
-        formula.price = e.target.value;
-        job.formula = formula;
-        console.log(job);
-        this.setState({job})
+    changeUnits = (e) => {
+        const job = {...this.state.job, units: e.target.value};
+        this.setState({job});
     };
 
-    changeUnitName = (e) => {
-        const job = {...this.state.job};
-        const formula = {...job.formula};
-        formula.unit_name = e.target.value;
-        job.formula = formula;
-        this.setState({job})
-    };
-
-    parseFormula = (str) => {
-        console.log(str);
-        if (str.includes("*")) {
-            const parts = str.split("*");
-            const price = parts[0];
-            const unit_name = parts[1].slice(1, -1);
-            return {
-                units_enabled: true,
-                unit_name,
-                price,
-            }
-        } else {
-            return {
-                units_enabled: false,
-                price: str
-            }
-        }
-    };
-
-    encodeFormula = (data) => {
-        if (data.units_enabled) {
-            return `${data.price}*{${data.unit_name}}`;
-        } else {
-            return data.price;
-        }
+    changeCategory = (e) => {
+        const job = {...this.state.job, category: e.target.value};
+        this.setState({job});
     };
 
     save = async (returnToMainSelected) => {
         this.setState({loading: true, returnToMainSelected});
         try {
             const job = {...this.state.job};
-            job.formula = this.encodeFormula(job.formula);
             if (this.state.mode === MODE_EDIT) {
                 await updateJob(job);
             } else {
@@ -132,13 +106,17 @@ export default class JobInfo extends Component {
         }
     };
 
-    renderButtons(){
-        if(this.state.mode === MODE_EDIT){
+    renderButtons() {
+        if (this.state.mode === MODE_EDIT) {
             return (
                 <Button.Group>
-                    <Button type="button" positive onClick={() => {this.save(true)}}>Save</Button>
+                    <Button type="button" positive onClick={() => {
+                        this.save(true)
+                    }}>Save</Button>
                     <Button.Or />
-                    <Button type="button" onClick={() => {this.save(false)}}>Save and continue</Button>
+                    <Button type="button" onClick={() => {
+                        this.save(false)
+                    }}>Save and continue</Button>
                 </Button.Group>
             );
         } else {
@@ -153,34 +131,35 @@ export default class JobInfo extends Component {
     render() {
         return (
             <Segment>
-                <Header as="h1">{this.state.mode === MODE_ADD ? 'Add job' : 'Edit job'}</Header>
+                <Header as="h1">{this.state.mode === MODE_ADD ? 'Add job' : `Job: ${this.state.job.name}`}</Header>
                 <Form loading={this.state.loading}>
                     <Form.Field required error={this.state.errors.name}>
                         <label>Name</label>
                         <input value={this.state.job.name} onChange={this.changeName}/>
                     </Form.Field>
+                    <Form.Input value={this.state.job.category} onChange={this.changeCategory} required label="Category" list='categories' placeholder='Choose category...' />
+                    <datalist id='categories'>
+                        {
+                            this.state.categories.map(cat => (
+                                <option value={cat}>{cat}</option>
+                            ))
+                        }
+                    </datalist>
                     <Form.Field error={this.state.errors.description}>
                         <label>Description</label>
                         <input value={this.state.job.description} onChange={this.changeDescription}/>
                     </Form.Field>
-                    <Form.Checkbox slider label='Countable' checked={this.state.job.formula.units_enabled}
-                                   onChange={this.changeCountable}/>
-                    {this.state.job.formula.units_enabled &&
-                    <Segment>
-                        <Form.Input required label="Unit name" placeholder="m, kg, etc" value={this.state.job.formula.unit_name} onChange={this.changeUnitName}/>
-                        <Form.Input required label="Price for one" value={this.state.job.formula.price} onChange={this.changePrice}/>
-                    </Segment>
-                    }
-                    {!this.state.job.formula.units_enabled &&
-                    <Form.Input requiredlabel="Price" value={this.state.job.formula.price} onChange={this.changePrice}/>
-                    }
+                    <Form.Input label="Unit name" placeholder="m, kg or empty" value={this.state.job.units}
+                                onChange={this.changeUnits}/>
+                    <Form.Input required label="Price for one" value={this.state.job.formula}
+                                onChange={this.changeFormula}/>
                     {this.renderButtons()}
                     {this.state.saved &&
                     <span style={{marginLeft: '10px'}}>Saved</span>
                     }
                 </Form>
                 {this.state.returnToMain &&
-                    <Redirect to="/admin/jobs" />
+                <Redirect to="/admin/jobs"/>
                 }
             </Segment>
         );

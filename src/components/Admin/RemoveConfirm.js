@@ -1,11 +1,11 @@
 import React from 'react'
 import { Button, Header, Icon, Modal } from 'semantic-ui-react'
 
-const RemoveJobConfirm = (props) => (
-    <Modal basic size='small' open={props.job !== null}>
-        <Header icon='delete' content={"Delete job"} />
+const RemoveConfirm = (props) => (
+    <Modal basic size='small' open={props.entity !== null}>
+        <Header icon='delete' content={`Delete ${props.entityName}`} />
         <Modal.Content>
-            <p>{`Do you want to remove job "${props.job ? props.job.name : ''}"?`}</p>
+            <p>{`Do you want to remove ${props.entityName} "${props.entity ? props.entity.name : ''}"?`}</p>
         </Modal.Content>
         <Modal.Actions>
             <Button basic color='red' inverted onClick={props.onCancel}>
@@ -18,4 +18,4 @@ const RemoveJobConfirm = (props) => (
     </Modal>
 );
 
-export default RemoveJobConfirm;
+export default RemoveConfirm;

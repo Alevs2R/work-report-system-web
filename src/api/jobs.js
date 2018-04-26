@@ -1,12 +1,20 @@
 import {HOST} from "../constants/constants";
 import {getUserToken} from "../components/User";
+import {getFormData} from "./utils";
 
 
 export const getJobsList = async () => {
     const token = getUserToken();
     const url = `http://${HOST}/jobs?token=${token}`;
     const response = await fetch(url , {method: 'GET'});
-    return (await response.json()).reverse();
+    return await response.json();
+};
+
+export const getCategories = async () => {
+    const token = getUserToken();
+    const url = `http://${HOST}/jobs?token=${token}&c=1`;
+    const response = await fetch(url , {method: 'GET'});
+    return (await response.json()).categories;
 };
 
 export const getJob = async (id) => {
@@ -52,20 +60,3 @@ export const deleteJob = async (id) => {
     });
     return response.ok;
 };
-
-function getFormData(srcjson){
-    if(typeof srcjson !== "object")
-        if(typeof console !== "undefined"){
-            console.log("\"srcjson\" is not a JSON object");
-            return null;
-        }
-    const u = encodeURIComponent;
-    var urljson = "";
-    var keys = Object.keys(srcjson);
-    for(var i=0; i <keys.length; i++){
-        urljson += u(keys[i]) + "=" + u(srcjson[keys[i]]);
-        if(i < (keys.length-1))urljson+="&";
-    }
-    return urljson;
-}
-

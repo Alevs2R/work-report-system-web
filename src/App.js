@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router, Route} from "react-router-dom";
+import {HashRouter as Router, Route} from "react-router-dom";
 import Auth from "./components/Auth";
 import SplashScreen from "./components/SplashScreen";
 import Admin from "./components/Admin";
